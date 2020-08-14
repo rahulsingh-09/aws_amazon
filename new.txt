@@ -1,4 +1,0 @@
-
-Hello, Welcome to git hub.
-This is a Demo project pushed from git .
-
