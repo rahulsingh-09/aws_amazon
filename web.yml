@@ -1,0 +1,56 @@
+---
+- name: Install pre-requisites and set up web server
+  hosts: all
+  become: true
+  become_user: root
+  tasks:
+    - name: add nodejs apt key
+      apt_key:
+        url: https://deb.nodesource.com/gpgkey/nodesource.gpg.key
+        state: present
+    - name: add nodejs repository
+      apt_repository:
+        repo: deb https://deb.nodesource.com/node_14.x {{ ansible_lsb.codename }} main
+        state: present
+        update_cache: yes
+    - name: install nodejs
+      apt:
+        name: nodejs
+        state: present
+    - name: install python-pip
+      apt:
+        name: python-pip
+        state: present
+    - name: Install required Python modules
+      pip:
+        name: 
+          -flask
+          -flask-cors
+          -waitress
+        executable: /usr/bin/pip
+    - name: Install "http-server" globally
+      npm:
+        name: http-server
+        global: yes
+    - name: Create a directory if it does not exist
+      file:
+        path: /home/ubuntu/App
+        state: directory
+        mode: '0777' 
+    - git:
+       repo: 'https://github.com/biswajit1987/Angular_With_Flux.git'
+       dest: /home/ubuntu/App/Angular_With_Flux
+       #  - name: Ensure localhost is set to public ip of vm
+       #lineinfile:
+       #path: /home/ubuntu/App/Angular_With_Flux/main.js
+       #regexp: '127.0.0.1'
+       #line: 127.0.0.1=3.129.8.217   
+    - name: Change directory to ~/App/Angular and run http server
+      command: nohup http-server
+      args:
+         chdir: /home/ubuntu/App/Angular_With_Flux
+    
+    
+      
+    
+...
