@@ -38,19 +38,47 @@
         state: directory
         mode: '0777' 
     - git:
-       repo: 'https://github.com/biswajit1987/Angular_With_Flux.git'
-       dest: /home/ubuntu/App/Angular_With_Flux
-       #  - name: Ensure localhost is set to public ip of vm
-       #lineinfile:
-       #path: /home/ubuntu/App/Angular_With_Flux/main.js
-       #regexp: '127.0.0.1'
-       #line: 127.0.0.1=3.129.8.217   
+       repo: 'https://github.com/biswajit1987/Angular_With_Flask.git'
+       dest: /home/ubuntu/App/Angular_With_Flask
+       update: yes 
+    - name: Modify mysql server
+      replace:
+        path: /home/ubuntu/App/Angular_With_Flask/main.js
+        regexp: '127.0.0.1:5000'
+        replace: '{{ hostvars["myweb-server"].ansible_host }}:5000' 
     - name: Change directory to ~/App/Angular and run http server
-      command: nohup http-server
+      command: nohup http-server 
+      async: 5000
+      poll: 0
       args:
-         chdir: /home/ubuntu/App/Angular_With_Flux
+         chdir: /home/ubuntu/App/Angular_With_Flask
     
-    
-      
+    - name: Create a directory if it does not exist
+      file:
+        path: /home/ubuntu/App/server
+        state: directory
+        mode: '0777'
+    - name: Change directory to ~/App/Angular and run move UsersAPI.py
+      command: mv /home/ubuntu/App/Angular_With_Flask/UsersAPI.py  .
+      args:
+         chdir: /home/ubuntu/App/server
+    - name: Modify Test.py to have DB IP
+      replace:
+        path: /home/ubuntu/App/Angular_With_Flux/UsersAPI.py
+        regexp: "<DB_SERVER>"
+        replace: "{{ hostvars[\"mydb-server\"].ansible_host }}"
+    - name: Modify UsersAPI.py to have webserver ip
+      replace:
+        path: /home/ubuntu/App/Angular_With_Flux/UsersAPI.py
+        regexp: '<WEB_SERVER>'
+        replace: '{{ hostvars["myweb-server"].ansible_host }}'
+    - name: Change directory to ~/App/Angular and run move UsersAPI.py
+      command: python UsersAPI.py
+    - name: giving recurse permission to all files inside App folder
+      file:
+       path: /home/ubuntu/App
+       state: directory
+       mode: '0777'
+       recurse: yes
     
 ...
