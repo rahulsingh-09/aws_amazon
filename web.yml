@@ -1,6 +1,6 @@
 ---
 - name: Install pre-requisites and set up web server
-  hosts: all
+  hosts: myhost
   become: true
   become_user: root
   tasks:
@@ -23,10 +23,15 @@
         state: present
     - name: Install required Python modules
       pip:
-        name: 
-          -flask
-          -flask_cors
-          -waitress
+        name: flask
+        executable: /usr/bin/pip
+    - name: Install required Python modules
+      pip:
+        name: flask_cors
+        executable: /usr/bin/pip
+    - name: Install required Python modules
+      pip:
+        name: waitress
         executable: /usr/bin/pip
     - name: Install "http-server" globally
       npm:
@@ -48,7 +53,7 @@
         replace: '{{ hostvars["myweb-server"].ansible_host }}:5000' 
     - name: Change directory to ~/App/Angular and run http server
       command: nohup http-server 
-      async: 5000
+      async: 10000
       poll: 0
       args:
          chdir: /home/ubuntu/App/Angular_With_Flask
@@ -64,16 +69,18 @@
          chdir: /home/ubuntu/App/server
     - name: Modify Test.py to have DB IP
       replace:
-        path: /home/ubuntu/App/Angular_With_Flux/UsersAPI.py
+        path: /home/ubuntu/App/server/UsersAPI.py
         regexp: "<DB_SERVER>"
         replace: "{{ hostvars[\"mydb-server\"].ansible_host }}"
     - name: Modify UsersAPI.py to have webserver ip
       replace:
-        path: /home/ubuntu/App/Angular_With_Flux/UsersAPI.py
+        path: /home/ubuntu/App/server/UsersAPI.py
         regexp: '<WEB_SERVER>'
-        replace: '{{ hostvars["myweb-server"].ansible_host }}'
+        replace: '{{ hostvars["mydb-server"].ansible_host }}'
     - name: Change directory to ~/App/Angular and run move UsersAPI.py
-      command: python UsersAPI.py
+      command: python /home/ubuntu/App/server/UsersAPI.py
+      async: 10000
+      poll: 0
     - name: giving recurse permission to all files inside App folder
       file:
        path: /home/ubuntu/App
