@@ -1,4 +1,4 @@
-Prereq: Ensure you have installed db server on controlled node and create demo user
+Prereq: Ensure you have installed db server on controlled node and created a demo user
 # Steps:-
 1. Install Ansible on your master node
 2. Edit /etc/ansible/hosts file and add your managed node ip's 
