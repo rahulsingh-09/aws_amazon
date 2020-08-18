@@ -1,4 +1,4 @@
-Prereq: Ensure you have installed db server on controlled node and mysql-connector-python as well and created a demo user
+Prereq: Ensure you have installed db server on controlled node and mysql-connector-python as well and created a demo user(https://github.com/biswajit1987/Angular_With_Flask.git)
 # Steps:-
 1. Install Ansible on your master node
 2. Edit /etc/ansible/hosts file and add your managed node ip's 
