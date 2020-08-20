@@ -1,6 +1,6 @@
 ---
 - name: Install pre-requisites and set up web server
-  hosts: myhost
+  hosts: webserver
   become: true
   become_user: root
   tasks:
@@ -17,26 +17,32 @@
       apt:
         name: nodejs
         state: present
-    - name: install python-pip
+    - name: Install Python3 dev and python3 mysqldb
       apt:
-        name: python-pip
+        pkg:
+          - python3-dev
+          - python3-mysqldb
+        state: present
+    - name: install python3-pip
+      apt:
+        name: python3-pip
         state: present
     - name: Install required Python modules
       pip:
-        name: flask
-        executable: /usr/bin/pip
-    - name: Install required Python modules
-      pip:
-        name: flask_cors
-        executable: /usr/bin/pip
-    - name: Install required Python modules
-      pip:
-        name: waitress
-        executable: /usr/bin/pip
+        name:
+         - flask
+         - flask_cors
+         - waitress
+         - mysql
+        executable: /usr/bin/pip3
     - name: Install "http-server" globally
       npm:
         name: http-server
         global: yes
+    - name: Removing existing directory as it contains locally modified files
+      file:
+        path: /home/ubuntu/App
+        state: absent
     - name: Create a directory if it does not exist
       file:
         path: /home/ubuntu/App
@@ -63,11 +69,11 @@
         path: /home/ubuntu/App/server
         state: directory
         mode: '0777'
-    - name: Change directory to ~/App/Angular and run move UsersAPI.py
+    - name: Change directory to ~/App/Angular and move UsersAPI.py
       command: mv /home/ubuntu/App/Angular_With_Flask/UsersAPI.py  .
       args:
          chdir: /home/ubuntu/App/server
-    - name: Modify Test.py to have DB IP
+    - name: Modify UsersAPI.py to have DB IP
       replace:
         path: /home/ubuntu/App/server/UsersAPI.py
         regexp: "<DB_SERVER>"
@@ -77,8 +83,8 @@
         path: /home/ubuntu/App/server/UsersAPI.py
         regexp: '<WEB_SERVER>'
         replace: '{{ hostvars["mydb-server"].ansible_host }}'
-    - name: Change directory to ~/App/Angular and run move UsersAPI.py
-      command: python /home/ubuntu/App/server/UsersAPI.py
+    - name: Change directory to ~/App/Angular and run UsersAPI.py
+      command: python3 /home/ubuntu/App/server/UsersAPI.py
       async: 10000
       poll: 0
     - name: giving recurse permission to all files inside App folder
