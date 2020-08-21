@@ -1,6 +1,6 @@
 ---
 - name: Install pre-requisites and set up web server
-  hosts: webserver
+  hosts: myweb-server
   become: true
   become_user: root
   tasks:
@@ -33,7 +33,7 @@
          - flask
          - flask_cors
          - waitress
-         - mysql
+         - mysql-connector-python
         executable: /usr/bin/pip3
     - name: Install "http-server" globally
       npm:
@@ -49,7 +49,7 @@
         state: directory
         mode: '0777' 
     - git:
-       repo: 'https://github.com/biswajit1987/Angular_With_Flask.git'
+       repo: 'https://github.com/appu-rajiv/Angular_With_Flask.git'
        dest: /home/ubuntu/App/Angular_With_Flask
        update: yes 
     - name: Modify mysql server
@@ -82,7 +82,7 @@
       replace:
         path: /home/ubuntu/App/server/UsersAPI.py
         regexp: '<WEB_SERVER>'
-        replace: '{{ hostvars["mydb-server"].ansible_host }}'
+        replace: '{{ hostvars["myweb-server"].ansible_host }}'
     - name: Change directory to ~/App/Angular and run UsersAPI.py
       command: python3 /home/ubuntu/App/server/UsersAPI.py
       async: 10000
