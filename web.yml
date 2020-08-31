@@ -82,16 +82,15 @@
       replace:
         path: /home/ubuntu/App/server/UsersAPI.py
         regexp: '<WEB_SERVER>'
-        replace: '{{ hostvars["myweb-server"].ansible_host }}'
-    - name: Change directory to ~/App/Angular and run UsersAPI.py
-      command: python3 /home/ubuntu/App/server/UsersAPI.py
-      async: 10000
-      poll: 0
+        replace: "{{ ansible_default_ipv4['address'] }}"
     - name: giving recurse permission to all files inside App folder
       file:
        path: /home/ubuntu/App
        state: directory
        mode: '0777'
        recurse: yes
-    
+    - name: Change directory to ~/App/Angular and run UsersAPI.py
+      command: python3 /home/ubuntu/App/server/UsersAPI.py
+      async: 10000
+      poll: 0
 ...
